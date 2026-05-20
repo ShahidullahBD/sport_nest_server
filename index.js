@@ -31,6 +31,7 @@ async function run() {
 
         const db = client.db('sport_nest_server');
         const allFacilitiesCollections = db.collection('all_facilities')
+        const bookingsCollections = db.collection('my-bookings')
 
         app.get('/all-facilities', async (req, res)=>{
             const result = await allFacilitiesCollections.find().toArray()
@@ -39,8 +40,32 @@ async function run() {
 
         app.get('/all-facilities/:id', async (req, res)=>{
             const {id} = req.params;
-            const result = await allFacilitiesCollections.findOne({_id:new ObjectId(id)})
+            const query = {
+                _id: new ObjectId(id)
+            };
+            const result = await allFacilitiesCollections.findOne(query)
             res.json(result)
+        })
+
+        app.post('/my-bookings', async (req, res)=>{
+            const bookingData = req.body;
+            console.log(bookingData, 'bookingData');
+            const result = await bookingsCollections.insertOne(bookingData);
+            res.send(result);
+        })
+
+        app.get('/my-bookings', async (req, res)=>{
+            const result =await bookingsCollections.find().toArray();
+            res.json(result);
+        })
+
+        app.delete('/my-bookings/:id', async (req, res)=>{
+            const {id} = req.params
+            const query = {
+                _id: new ObjectId(id)
+            }
+            const result = bookingsCollections.deleteOne(query);
+            res.send(result);
         })
 
 
